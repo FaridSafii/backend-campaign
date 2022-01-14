@@ -1,0 +1,60 @@
+package main
+
+import (
+	"backendstartup/user"
+	"log"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+)
+
+func main() {
+	// // Pembuatan koneksi
+	// dsn := "root:@tcp(127.0.0.1:3306)/campaign_backend?charset=utf8mb4&parseTime=True&loc=Local"
+	// db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+
+	// //Menampilkan kesalahan
+	// if err != nil {
+	// 	log.Fatal(err.Error())
+	// }
+	// //Mencetak status koneksi database
+	// //fmt.Println("Connection to database success")
+
+	// //Mendefinisikan var users sebagai array menampung data struct user
+	// var users []user.User
+
+	// //Mencari database yang sesuai dengan struct dengan pointer
+	// db.Find(&users)
+
+	// //mengambil berapa jumlah data yang ada dalam tabel users melalui struct
+	// //length := len(users)
+	// //fmt.Println(length)
+
+	// //Looping mencetak data dalam array user
+	// for _, user := range users {
+	// 	fmt.Println(user.Name)
+	// 	fmt.Println(user.Email)
+	// 	//fmt.Println("================")
+	// }
+
+	router := gin.Default()
+	router.GET("/user", handler)
+	router.Run(":8088")
+}
+
+//handler selayaknya controller
+func handler(c *gin.Context) {
+	// Pembuatan koneksi
+	dsn := "root:@tcp(127.0.0.1:3306)/campaign_backend?charset=utf8mb4&parseTime=True&loc=Local"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	var users []user.User
+	db.Find(&users)
+	c.JSON(http.StatusOK, users)
+
+}
