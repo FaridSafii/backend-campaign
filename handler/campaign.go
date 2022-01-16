@@ -24,6 +24,8 @@ func NewCampaignHandler(service campaign.Service) *campaignHandler {
 }
 
 func (h *campaignHandler) GetCampaigns(c *gin.Context) {
+	//Query parameter dengan menangkap params dari get
+	//hasil string di konversi ke integer menggunakan strconv.Atoi
 	userID, _ := strconv.Atoi(c.Query("user_id"))
 	campaigns, err := h.service.GetCampaigns(userID)
 	if err != nil {
@@ -31,6 +33,6 @@ func (h *campaignHandler) GetCampaigns(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-	response := helper.APIResponse("Successfully to get campaigns", http.StatusOK, "success", campaigns)
+	response := helper.APIResponse("Successfully to get campaigns", http.StatusOK, "success", campaign.FormatCampaigns(campaigns))
 	c.JSON(http.StatusOK, response)
 }
