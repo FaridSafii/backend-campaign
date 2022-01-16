@@ -6,7 +6,6 @@ import (
 	"backendstartup/handler"
 	"backendstartup/helper"
 	"backendstartup/user"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -36,8 +35,7 @@ func main() {
 	//Campaign
 	campaignRepository := campaign.NewRepository(db)
 	campaignService := campaign.NewService(campaignRepository)
-	campaigns, _ := campaignService.FindCampaigns(2)
-	fmt.Println(len(campaigns))
+	campaignHandler := handler.NewCampaignHandler(campaignService)
 
 	//fmt.Println(authService.GenerateToken(1001))
 	router := gin.Default()
@@ -46,6 +44,7 @@ func main() {
 	api.POST("users", userHandler.RegisterUser)
 	api.POST("sessions", userHandler.Login)
 	api.POST("email_checker", userHandler.CheckEmailAvailability)
+	api.GET("campaigns", campaignHandler.GetCampaigns)
 	api.POST("avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
 	router.Run(":8088")
 
