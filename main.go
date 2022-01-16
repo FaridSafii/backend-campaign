@@ -42,7 +42,10 @@ func main() {
 
 func authMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
+
+		//Mengambil header
 		authHeader := c.GetHeader("Authorization")
+		//jika header tidak memiliki string Bearer maka Unauthorized
 		if !strings.Contains(authHeader, "Bearer") {
 			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
@@ -54,13 +57,15 @@ func authMiddleware(authService auth.Service, userService user.Service) gin.Hand
 		if len(arrayToken) == 2 {
 			tokenString = arrayToken[1]
 		}
-		token, err := authService.ValidateToken(tokenString)
 
+		//Mencek apakah method yang digunakan sama menggunakan ValidateToken
+		token, err := authService.ValidateToken(tokenString)
 		if err != nil {
 			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
+		//Jika metode sama maka dicek apakah token Valid atau tidak
 		claim, ok := token.Claims.(jwt.MapClaims)
 		if !ok || !token.Valid {
 			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
@@ -68,14 +73,18 @@ func authMiddleware(authService auth.Service, userService user.Service) gin.Hand
 			return
 		}
 
+		//Jika sudah melewati validasi diatas maka mengambil data user_id di claim jwt
 		userID := int(claim["user_id"].(float64))
+		//dan dicari kedalam service GetUserByID
 		user, err := userService.GetUserByID(userID)
+		//Jika tidak ada data user maka Unauthorized
 		if err != nil {
 			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
 			return
 		}
 
+		//data yang ditemukan di claim akan di set di GIN kedalam variabel currentUser -> handler
 		c.Set("currentUser", user)
 	}
 }
