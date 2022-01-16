@@ -44,7 +44,9 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 	// token, err := h.jwtService.GenerateToken()
-	token, err := h.authService.GenerateToken(newUser.ID, newUser.Name)
+	//memanggil auth dengan generate 2 parameter
+	//token, err := h.authService.GenerateToken(newUser.ID, newUser.Name)
+	token, err := h.authService.GenerateToken(newUser.ID)
 	if err != nil {
 		response := helper.APIResponse("Register account failed", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
@@ -81,7 +83,9 @@ func (h *userHandler) Login(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
-	token, err := h.authService.GenerateToken(loggedinUser.ID, loggedinUser.Name)
+	//memanggil auth dengan generate 2 parameter
+	//token, err := h.authService.GenerateToken(loggedinUser.ID, loggedinUser.Name)
+	token, err := h.authService.GenerateToken(loggedinUser.ID)
 	if err != nil {
 		errorMessage := gin.H{"errors": err.Error()}
 		response := helper.APIResponse("Login failed", http.StatusUnprocessableEntity, "error", errorMessage)
@@ -142,7 +146,12 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
-	userID := 1
+
+	//currentUSer diambil dari middleware
+	// .(user.User) diambil untuk get data user
+	//  currentUser.ID -> currentUser sebagai penampung dan hanya get data ID saja
+	currentUser := c.MustGet("currentUser").(user.User)
+	userID := currentUser.ID
 
 	//new path images/id-namafile.png
 	//%d-%s -> perwakilan dari %d (desimal) userID dan %s (string) file.Filename
