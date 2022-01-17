@@ -1,6 +1,9 @@
 package campaign
 
-import "time"
+import (
+	"backendstartup/user"
+	"time"
+)
 
 type Campaign struct {
 	ID               int
@@ -17,6 +20,7 @@ type Campaign struct {
 	UpdatedAt        time.Time
 	//Relasi ke struct CampaignImage => check repo untuk relation
 	CampaignImages []CampaignImage
+	User           user.User
 }
 
 type CampaignImage struct {

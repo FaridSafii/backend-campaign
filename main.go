@@ -39,13 +39,18 @@ func main() {
 
 	//fmt.Println(authService.GenerateToken(1001))
 	router := gin.Default()
+	//Routing get images file on client side, params 1 routenya, params 2 lokasi folder
+	router.Static("/images", "./images")
+
 	api := router.Group("/api/v1")
 	//userService.SaveAvatar(1, "images/1-profile.png")
 	api.POST("users", userHandler.RegisterUser)
 	api.POST("sessions", userHandler.Login)
 	api.POST("email_checker", userHandler.CheckEmailAvailability)
 	api.GET("campaigns", campaignHandler.GetCampaigns)
+	api.GET("campaigns/:id", campaignHandler.GetCampaign)
 	api.POST("avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
+
 	router.Run(":8088")
 
 }
