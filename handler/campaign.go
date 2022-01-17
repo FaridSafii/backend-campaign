@@ -3,6 +3,7 @@ package handler
 import (
 	"backendstartup/campaign"
 	"backendstartup/helper"
+	"backendstartup/user"
 	"net/http"
 	"strconv"
 
@@ -58,4 +59,30 @@ func (h *campaignHandler) GetCampaign(c *gin.Context) {
 	//handler : mapping id yang di url ke struct input => service, dan call formatter
 	//service : inputnya struct input => menangkap id di url, meanggil repo
 	//repository : get campaign by id
+}
+
+func (h *campaignHandler) CreateCampaign(c *gin.Context) {
+	var input campaign.CreateCampaignInput
+
+	err := c.ShouldBindJSON(&input)
+	//Manage error validation input user
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		//map dalam gin -> gin.H
+		errorMessage := gin.H{"error": errors}
+		response := helper.APIResponse("Failed to create campaign", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+	currentUser := c.MustGet("currentUser").(user.User)
+	input.User = currentUser
+
+	newCampaign, err := h.service.CreateCampaign(input)
+	if err != nil {
+		response := helper.APIResponse("Failed to create campaign", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	response := helper.APIResponse("Success to create campaign", http.StatusOK, "success", campaign.FormatCampaign(newCampaign))
+	c.JSON(http.StatusOK, response)
 }
