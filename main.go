@@ -49,7 +49,10 @@ func main() {
 	api.POST("email_checker", userHandler.CheckEmailAvailability)
 	api.GET("campaigns", campaignHandler.GetCampaigns)
 	api.POST("campaigns", authMiddleware(authService, userService), campaignHandler.CreateCampaign)
+	//endpoint get campaign by ID
 	api.GET("campaigns/:id", campaignHandler.GetCampaign)
+
+	//endpoint upload avatars
 	api.POST("avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
 
 	router.Run(":8088")
