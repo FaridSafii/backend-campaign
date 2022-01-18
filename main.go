@@ -41,22 +41,36 @@ func main() {
 	router := gin.Default()
 	//Routing get images file on client side, params 1 routenya, params 2 lokasi folder
 	router.Static("/images", "./images")
+	router.Static("/campaign-images", "./campaign-images")
 
 	api := router.Group("/api/v1")
 	//userService.SaveAvatar(1, "images/1-profile.png")
+	//Endpoint register user
 	api.POST("users", userHandler.RegisterUser)
+
+	//Endpoint login session
 	api.POST("sessions", userHandler.Login)
+
+	//Endpoint cek ketersediaan email
 	api.POST("email_checker", userHandler.CheckEmailAvailability)
+
+	//endpoint upload avatars
+	api.POST("avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
+
+	//Endpoint mengambil seluruh data campaign
 	api.GET("campaigns", campaignHandler.GetCampaigns)
-	api.POST("campaigns", authMiddleware(authService, userService), campaignHandler.CreateCampaign)
+
 	//endpoint get campaign by ID
 	api.GET("campaigns/:id", campaignHandler.GetCampaign)
+
+	//Endpoint membuat campaign
+	api.POST("campaigns", authMiddleware(authService, userService), campaignHandler.CreateCampaign)
 
 	//Update Campaign
 	api.PUT("campaigns/:id", authMiddleware(authService, userService), campaignHandler.UpdateCampaign)
 
-	//endpoint upload avatars
-	api.POST("avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
+	//Upload campaign images
+	api.POST("campaign-images", authMiddleware(authService, userService), campaignHandler.UploadImage)
 
 	router.Run(":8088")
 
