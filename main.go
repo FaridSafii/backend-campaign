@@ -5,6 +5,7 @@ import (
 	"backendstartup/campaign"
 	"backendstartup/handler"
 	"backendstartup/helper"
+	"backendstartup/transaction"
 	"backendstartup/user"
 	"log"
 	"net/http"
@@ -36,6 +37,12 @@ func main() {
 	campaignRepository := campaign.NewRepository(db)
 	campaignService := campaign.NewService(campaignRepository)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
+
+	//Transaction
+	transactionRepository := transaction.NewRepository(db)
+	//campaignRepository digunakan untuk menginjact data campain di service transaction
+	transactionService := transaction.NewService(transactionRepository, campaignRepository)
+	transactionHandler := handler.NewTransactionHandler(transactionService)
 
 	//fmt.Println(authService.GenerateToken(1001))
 	router := gin.Default()
@@ -72,6 +79,7 @@ func main() {
 	//Upload campaign images
 	api.POST("campaign-images", authMiddleware(authService, userService), campaignHandler.UploadImage)
 
+	api.GET("campaigns/:id/trasactions", authMiddleware(authService, userService), transactionHandler.GetCampaignTransactions)
 	router.Run(":8088")
 
 }
