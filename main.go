@@ -52,6 +52,9 @@ func main() {
 	//endpoint get campaign by ID
 	api.GET("campaigns/:id", campaignHandler.GetCampaign)
 
+	//Update Campaign
+	api.PUT("campaigns/:id", authMiddleware(authService, userService), campaignHandler.UpdateCampaign)
+
 	//endpoint upload avatars
 	api.POST("avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
 
