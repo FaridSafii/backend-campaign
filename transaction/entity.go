@@ -1,6 +1,7 @@
 package transaction
 
 import (
+	"backendstartup/campaign"
 	"backendstartup/user"
 	"time"
 )
@@ -14,5 +15,6 @@ type Transaction struct {
 	Code       string
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
+	Campaign   campaign.Campaign
 	User       user.User
 }

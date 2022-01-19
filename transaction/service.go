@@ -7,12 +7,13 @@ import (
 
 type service struct {
 	repository Repository
-	//injact data campaign di service transaction
+	//inject data campaign di service transaction
 	campaignRepository campaign.Repository
 }
 
 type Service interface {
 	GetTransactionByCampaignID(input GetCampaignTransactionsInput) ([]Transaction, error)
+	GetTrasactionByUserID(userID int) ([]Transaction, error)
 }
 
 //Harus mendeklarasikan bahwa campaignRepositoy juga digunakan di transaction service
@@ -37,4 +38,12 @@ func (s *service) GetTransactionByCampaignID(input GetCampaignTransactionsInput)
 		return transactions, err
 	}
 	return transactions, nil
+}
+
+func (s *service) GetTrasactionByUserID(userID int) ([]Transaction, error) {
+	transaction, err := s.repository.GetByUserID(userID)
+	if err != nil {
+		return transaction, err
+	}
+	return transaction, nil
 }
